@@ -9,6 +9,20 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
+## [0.1.0] - 2026-05-14
+
+- **Added**
   - Bootstrapped `@plasius/scene-layout` with layout manifest contracts, validation helpers, and responsive variant resolution.
   - Added ADR coverage for public scene layout boundaries and rollout ownership.
 
@@ -24,3 +38,6 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ---
 
 [Unreleased]: https://github.com/Plasius-LTD/scene-layout/compare/v0.1.0...HEAD
+
+
+[0.1.0]: https://github.com/Plasius-LTD/scene-layout/releases/tag/v0.1.0
