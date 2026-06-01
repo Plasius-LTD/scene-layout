@@ -1,6 +1,6 @@
 {
   "name": "@plasius/scene-layout",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Reusable scene layout contracts, validation, and responsive variant resolution for Plasius runtimes",
   "type": "module",
   "sideEffects": false,
