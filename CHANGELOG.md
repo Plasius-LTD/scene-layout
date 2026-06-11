@@ -9,10 +9,10 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 ## [Unreleased]
 
 - **Added**
-  - (placeholder)
+  - Exported reusable overlay semantics and canonical Player/Party composition zone ids for world-space panels, focus panes, reduced-combat overlays, and shared alert stacks.
 
 - **Changed**
-  - (placeholder)
+  - Extended scene layout manifest validation to fail closed when overlay composition semantics are malformed or ambiguous.
 
 - **Fixed**
   - (placeholder)
