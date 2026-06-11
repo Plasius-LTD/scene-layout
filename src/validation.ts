@@ -2,12 +2,16 @@ import {
   SCENE_LAYOUT_SCHEMA_VERSION,
   type SceneLayoutAnchor,
   type SceneLayoutBreakpoint,
+  type SceneLayoutCollisionPolicy,
   type SceneLayoutManifest,
   type SceneLayoutRect,
   type SceneLayoutSurface,
+  type SceneLayoutSurfaceFamily,
   type SceneLayoutValidationIssue,
   type SceneLayoutValidationResult,
   type SceneLayoutVariant,
+  type SceneLayoutVisibilityMode,
+  type SceneLayoutZoneSemantics,
   type SceneLayoutZone,
 } from "./types.js";
 
@@ -19,10 +23,31 @@ const COORDINATE_SPACES = new Set([
   "world",
   "local",
 ]);
-
 const UNITS = new Set(["ratio", "pixels"]);
 const ALIGNMENTS = new Set(["start", "center", "end"]);
 const ORIENTATIONS = new Set(["portrait", "landscape", "any"]);
+const SURFACE_FAMILIES = new Set<SceneLayoutSurfaceFamily>([
+  "player-system",
+  "party-system",
+  "shared",
+]);
+const ZONE_ROLES = new Set([
+  "world-space-panel",
+  "focus-pane",
+  "reduced-combat-overlay",
+  "overlay-rail",
+  "alert-stack",
+]);
+const VISIBILITY_MODES = new Set<SceneLayoutVisibilityMode>([
+  "ambient",
+  "focused",
+  "combat-reduced",
+]);
+const COLLISION_POLICIES = new Set<SceneLayoutCollisionPolicy>([
+  "stack",
+  "exclusive",
+  "allow-overlap",
+]);
 
 function pushIssue(
   issues: SceneLayoutValidationIssue[],
@@ -98,6 +123,51 @@ function validateStringArray(
         code: "duplicate-id",
         path: `${path}[${index}]`,
         message: `Duplicate tag '${item}' is not allowed.`,
+      });
+      valid = false;
+      continue;
+    }
+
+    seen.add(item);
+  }
+
+  return valid;
+}
+
+function validateVisibilityModes(
+  value: unknown,
+  path: string,
+  issues: SceneLayoutValidationIssue[],
+): value is SceneLayoutVisibilityMode[] {
+  if (!Array.isArray(value) || value.length === 0) {
+    pushIssue(issues, {
+      code: "required",
+      path,
+      message: "visibilityModes must contain at least one mode.",
+    });
+    return false;
+  }
+
+  let valid = true;
+  const seen = new Set<string>();
+
+  for (const [index, item] of value.entries()) {
+    if (!VISIBILITY_MODES.has(item as SceneLayoutVisibilityMode)) {
+      pushIssue(issues, {
+        code: "invalid-value",
+        path: `${path}[${index}]`,
+        message:
+          "visibilityModes entries must be ambient, focused, or combat-reduced.",
+      });
+      valid = false;
+      continue;
+    }
+
+    if (seen.has(item)) {
+      pushIssue(issues, {
+        code: "duplicate-id",
+        path: `${path}[${index}]`,
+        message: `Duplicate visibility mode '${item}' is not allowed.`,
       });
       valid = false;
       continue;
@@ -284,6 +354,62 @@ function validateAnchor(
   return valid;
 }
 
+function validateZoneSemantics(
+  semantics: unknown,
+  path: string,
+  issues: SceneLayoutValidationIssue[],
+): semantics is SceneLayoutZoneSemantics {
+  if (!semantics || typeof semantics !== "object") {
+    pushIssue(issues, {
+      code: "required",
+      path,
+      message: "Expected a zone semantics definition.",
+    });
+    return false;
+  }
+
+  const value = semantics as Record<string, unknown>;
+  let valid = true;
+
+  if (!SURFACE_FAMILIES.has(value.surfaceFamily as SceneLayoutSurfaceFamily)) {
+    pushIssue(issues, {
+      code: "invalid-value",
+      path: `${path}.surfaceFamily`,
+      message: "surfaceFamily must be player-system, party-system, or shared.",
+    });
+    valid = false;
+  }
+
+  if (!ZONE_ROLES.has(String(value.role))) {
+    pushIssue(issues, {
+      code: "invalid-value",
+      path: `${path}.role`,
+      message:
+        "role must be world-space-panel, focus-pane, reduced-combat-overlay, overlay-rail, or alert-stack.",
+    });
+    valid = false;
+  }
+
+  if (
+    value.collisionPolicy !== undefined
+    && !COLLISION_POLICIES.has(value.collisionPolicy as SceneLayoutCollisionPolicy)
+  ) {
+    pushIssue(issues, {
+      code: "invalid-value",
+      path: `${path}.collisionPolicy`,
+      message:
+        "collisionPolicy must be stack, exclusive, or allow-overlap when provided.",
+    });
+    valid = false;
+  }
+
+  if (!validateVisibilityModes(value.visibilityModes, `${path}.visibilityModes`, issues)) {
+    valid = false;
+  }
+
+  return valid;
+}
+
 function validateZone(
   zone: unknown,
   path: string,
@@ -355,6 +481,13 @@ function validateZone(
 
       seenAnchors.add(id);
     }
+  }
+
+  if (
+    value.semantics !== undefined
+    && !validateZoneSemantics(value.semantics, `${path}.semantics`, issues)
+  ) {
+    valid = false;
   }
 
   if (!validateStringArray(value.tags, `${path}.tags`, issues)) {

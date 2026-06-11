@@ -1,6 +1,13 @@
 export const SCENE_LAYOUT_SCHEMA_VERSION = "1.0.0";
 export const SCENE_LAYOUT_FOUNDATION_FLAG_ID =
   "scene.layout.foundation.enabled";
+export const SCENE_LAYOUT_INTERFACE_ZONE_IDS = {
+  playerSystemWorldPanel: "player-system-world-panel",
+  playerSystemFocusPane: "player-system-focus-pane",
+  playerSystemReducedCombatOverlay: "player-system-reduced-combat-overlay",
+  partySystemOverlayRail: "party-system-overlay-rail",
+  sharedAlertStack: "shared-alert-stack",
+} as const;
 
 export type SceneLayoutCoordinateSpace =
   | "normalized-viewport"
@@ -13,6 +20,28 @@ export type SceneLayoutUnit = "ratio" | "pixels";
 export type SceneLayoutAlignment = "start" | "center" | "end";
 
 export type SceneLayoutOrientation = "portrait" | "landscape" | "any";
+
+export type SceneLayoutSurfaceFamily =
+  | "player-system"
+  | "party-system"
+  | "shared";
+
+export type SceneLayoutZoneRole =
+  | "world-space-panel"
+  | "focus-pane"
+  | "reduced-combat-overlay"
+  | "overlay-rail"
+  | "alert-stack";
+
+export type SceneLayoutVisibilityMode =
+  | "ambient"
+  | "focused"
+  | "combat-reduced";
+
+export type SceneLayoutCollisionPolicy =
+  | "stack"
+  | "exclusive"
+  | "allow-overlap";
 
 export interface SceneLayoutRect {
   x: number;
@@ -32,12 +61,20 @@ export interface SceneLayoutAnchor {
   tags?: string[];
 }
 
+export interface SceneLayoutZoneSemantics {
+  surfaceFamily: SceneLayoutSurfaceFamily;
+  role: SceneLayoutZoneRole;
+  visibilityModes: SceneLayoutVisibilityMode[];
+  collisionPolicy?: SceneLayoutCollisionPolicy;
+}
+
 export interface SceneLayoutZone {
   id: string;
   coordinateSpace: SceneLayoutCoordinateSpace;
   rect: SceneLayoutRect;
   anchors: SceneLayoutAnchor[];
   allowOverflow?: boolean;
+  semantics?: SceneLayoutZoneSemantics;
   tags?: string[];
 }
 

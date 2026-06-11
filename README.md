@@ -7,7 +7,7 @@
 [![Security Policy](https://img.shields.io/badge/security%20policy-yes-orange.svg)](./SECURITY.md)
 [![Changelog](https://img.shields.io/badge/changelog-md-blue.svg)](./CHANGELOG.md)
 
-Reusable scene layout contracts for zones, anchors, coordinate spaces, and responsive placement variants.
+Reusable scene layout contracts for zones, anchors, coordinate spaces, responsive placement variants, and overlay composition semantics.
 
 Apache-2.0. ESM + CJS builds. TypeScript types included.
 
@@ -31,6 +31,7 @@ Source of truth:
 ## What the package exports
 
 - stable TypeScript types for layout manifests, zones, anchors, and variants
+- exported overlay semantics for Player System, Party System, and shared alert composition zones
 - deterministic validation helpers for untrusted runtime input
 - responsive variant resolution for width, height, orientation, and aspect ratio
 
@@ -38,6 +39,7 @@ Source of truth:
 
 ```ts
 import {
+  SCENE_LAYOUT_INTERFACE_ZONE_IDS,
   createSceneLayoutManifest,
   resolveSceneLayoutVariant,
   type SceneLayoutManifest,
@@ -55,7 +57,7 @@ const manifest: SceneLayoutManifest = createSceneLayoutManifest({
       },
       zones: [
         {
-          id: "hero",
+          id: SCENE_LAYOUT_INTERFACE_ZONE_IDS.playerSystemWorldPanel,
           coordinateSpace: "normalized-viewport",
           rect: { x: 0.05, y: 0.08, width: 0.5, height: 0.36, unit: "ratio" },
           anchors: [
@@ -67,6 +69,12 @@ const manifest: SceneLayoutManifest = createSceneLayoutManifest({
               vertical: "center",
             },
           ],
+          semantics: {
+            surfaceFamily: "player-system",
+            role: "world-space-panel",
+            visibilityModes: ["ambient", "focused"],
+            collisionPolicy: "stack",
+          },
         },
       ],
     },
@@ -96,6 +104,23 @@ Anchors are normalized within a zone. Their coordinates are always `0..1` and us
 - `center`
 - `end`
 
+### Overlay composition semantics
+
+Zones can opt into reusable overlay semantics for Player System and Party System composition:
+
+- `surfaceFamily`: `player-system`, `party-system`, or `shared`
+- `role`: `world-space-panel`, `focus-pane`, `reduced-combat-overlay`, `overlay-rail`, or `alert-stack`
+- `visibilityModes`: one or more of `ambient`, `focused`, or `combat-reduced`
+- `collisionPolicy`: `stack`, `exclusive`, or `allow-overlap`
+
+The package also exports stable zone ids for the first Player/Party interface foundation:
+
+- `player-system-world-panel`
+- `player-system-focus-pane`
+- `player-system-reduced-combat-overlay`
+- `party-system-overlay-rail`
+- `shared-alert-stack`
+
 ### Variant resolution
 
 Variants can constrain:
@@ -112,6 +137,7 @@ If multiple variants match, the resolver prefers the most specific one. If none 
 
 - ids must be kebab-case
 - variants, zones, and anchors must have unique ids within their scope
+- overlay semantics fail closed for invalid surface families, roles, collision policies, or duplicate visibility modes
 - surfaces and dimensions must be finite positive numbers
 - ratio rectangles and anchor coordinates are bounded
 - variant selection inputs are validated before resolution

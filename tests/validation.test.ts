@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   SCENE_LAYOUT_FOUNDATION_FLAG_ID,
+  SCENE_LAYOUT_INTERFACE_ZONE_IDS,
   SCENE_LAYOUT_SCHEMA_VERSION,
   createSceneLayoutManifest,
   validateSceneLayoutSurface,
@@ -38,6 +39,12 @@ const validManifest: SceneLayoutManifest = {
               vertical: "center",
             },
           ],
+          semantics: {
+            surfaceFamily: "player-system",
+            role: "world-space-panel",
+            visibilityModes: ["ambient", "focused"],
+            collisionPolicy: "stack",
+          },
         },
       ],
     },
@@ -60,6 +67,16 @@ describe("scene layout manifest validation", () => {
     expect(SCENE_LAYOUT_FOUNDATION_FLAG_ID).toBe(
       "scene.layout.foundation.enabled",
     );
+  });
+
+  it("exports the documented overlay zone ids", () => {
+    expect(SCENE_LAYOUT_INTERFACE_ZONE_IDS).toEqual({
+      playerSystemWorldPanel: "player-system-world-panel",
+      playerSystemFocusPane: "player-system-focus-pane",
+      playerSystemReducedCombatOverlay: "player-system-reduced-combat-overlay",
+      partySystemOverlayRail: "party-system-overlay-rail",
+      sharedAlertStack: "shared-alert-stack",
+    });
   });
 
   it("rejects duplicate anchor ids within a zone", () => {
@@ -243,6 +260,12 @@ describe("scene layout manifest validation", () => {
                 },
               ],
               tags: "bad",
+              semantics: {
+                surfaceFamily: "everywhere",
+                role: "bad-role",
+                visibilityModes: ["ambient", "ambient", "danger"],
+                collisionPolicy: "bounce",
+              },
             },
             {
               id: "hero",
@@ -292,6 +315,21 @@ describe("scene layout manifest validation", () => {
           path: "$.variants[0].zones[0].tags",
         }),
         expect.objectContaining({
+          path: "$.variants[0].zones[0].semantics.surfaceFamily",
+        }),
+        expect.objectContaining({
+          path: "$.variants[0].zones[0].semantics.role",
+        }),
+        expect.objectContaining({
+          path: "$.variants[0].zones[0].semantics.visibilityModes[1]",
+        }),
+        expect.objectContaining({
+          path: "$.variants[0].zones[0].semantics.visibilityModes[2]",
+        }),
+        expect.objectContaining({
+          path: "$.variants[0].zones[0].semantics.collisionPolicy",
+        }),
+        expect.objectContaining({
           path: "$.variants[0].zones[1].coordinateSpace",
         }),
         expect.objectContaining({
@@ -302,6 +340,37 @@ describe("scene layout manifest validation", () => {
         }),
         expect.objectContaining({
           path: "$.variants[0].zones[1].anchors[0].id",
+        }),
+      ]),
+    );
+  });
+
+  it("requires at least one visibility mode when semantics are provided", () => {
+    const result = validateSceneLayoutManifest({
+      ...validManifest,
+      variants: [
+        {
+          ...baseVariant,
+          zones: [
+            {
+              ...baseZone,
+              semantics: {
+                surfaceFamily: "shared",
+                role: "alert-stack",
+                visibilityModes: [],
+              },
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(result.valid).toBe(false);
+    expect(result.issues).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "required",
+          path: "$.variants[0].zones[0].semantics.visibilityModes",
         }),
       ]),
     );
