@@ -4,7 +4,7 @@ export default defineConfig({
   test: {
     environment: "node",
     globals: true,
-    include: ["tests/**/*.test.{ts,tsx}"],
+    include: ["tests/**/*.test.{ts,tsx,js,mjs,cjs}"],
     passWithNoTests: false,
     coverage: {
       all: false,
@@ -15,7 +15,6 @@ export default defineConfig({
         "tests/**",
         "dist/**",
         "coverage/**",
-        "scripts/**",
         "**/*.config.{js,ts}",
         "**/.eslintrc.{js,cjs}",
         "eslint.config.js",
