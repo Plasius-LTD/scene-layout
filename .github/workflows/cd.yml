@@ -115,9 +115,27 @@ jobs:
 
           CURRENT_VERSION=$(node -p "require('./package.json').version")
           PACKAGE_NAME=$(node -p "require('./package.json').name")
+          PUBLISHED_VERSION=""
+          if npm view "${PACKAGE_NAME}" version >/dev/null 2>&1; then
+            PUBLISHED_VERSION=$(npm view "${PACKAGE_NAME}" version)
+          fi
+
+          HIGHEST_KNOWN_VERSION=$(
+            {
+              printf '%s\n' "${CURRENT_VERSION}"
+              if [ -n "${PUBLISHED_VERSION}" ]; then
+                printf '%s\n' "${PUBLISHED_VERSION}"
+              fi
+              git tag --list 'v*'
+            } | node scripts/resolve-release-base-version.mjs
+          )
 
           case "${BUMP:-patch}" in
             major|minor|patch)
+              if [ "${HIGHEST_KNOWN_VERSION}" != "${CURRENT_VERSION}" ]; then
+                npm version "${HIGHEST_KNOWN_VERSION}" --allow-same-version --no-git-tag-version >/dev/null
+              fi
+
               if [ -n "${PREID:-}" ]; then
                 case "${BUMP}" in
                   major) npm version premajor --preid "${PREID}" --no-git-tag-version >/dev/null ;;
@@ -129,6 +147,11 @@ jobs:
               fi
               ;;
             none)
+              if [ "${HIGHEST_KNOWN_VERSION}" != "${CURRENT_VERSION}" ]; then
+                echo "Current version ${CURRENT_VERSION} trails published/tagged state ${HIGHEST_KNOWN_VERSION}; choose a bump to prepare the next release." >&2
+                exit 1
+              fi
+
               echo "Leaving package.json version unchanged at ${CURRENT_VERSION}."
               ;;
             *)
@@ -143,6 +166,11 @@ jobs:
 
           if git ls-remote --exit-code --heads origin "${BRANCH}" >/dev/null 2>&1; then
             echo "Release branch ${BRANCH} already exists." >&2
+            exit 1
+          fi
+
+          if git ls-remote --exit-code --tags origin "refs/tags/${TAG}" >/dev/null 2>&1; then
+            echo "Release tag ${TAG} already exists on origin." >&2
             exit 1
           fi
 
@@ -244,6 +272,7 @@ jobs:
             --body "${PR_BODY}")
 
           echo "branch=${BRANCH}" >> "${GITHUB_OUTPUT}"
+          echo "base_version=${HIGHEST_KNOWN_VERSION}" >> "${GITHUB_OUTPUT}"
           echo "tag=${TAG}" >> "${GITHUB_OUTPUT}"
           echo "version=${NEXT_VERSION}" >> "${GITHUB_OUTPUT}"
           echo "pr_url=${PR_URL}" >> "${GITHUB_OUTPUT}"
@@ -252,6 +281,7 @@ jobs:
         run: |
           {
             echo "Prepared protected-branch-safe release PR:"
+            echo "- reconciled occupied version: ${{ steps.prep.outputs.base_version }}"
             echo "- branch: ${{ steps.prep.outputs.branch }}"
             echo "- tag: ${{ steps.prep.outputs.tag }}"
             echo "- PR: ${{ steps.prep.outputs.pr_url }}"

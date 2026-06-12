@@ -15,7 +15,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - Extended scene layout manifest validation to fail closed when overlay composition semantics are malformed or ambiguous.
 
 - **Fixed**
-  - (placeholder)
+  - Hardened release preparation so protected-branch-safe CD derives the next version from repository, tag, and npm state instead of colliding with already-published versions.
 
 - **Security**
   - (placeholder)
