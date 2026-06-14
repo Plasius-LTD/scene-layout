@@ -30,6 +30,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 - **Fixed**
   - Hardened release preparation so protected-branch-safe CD derives the next version from repository, tag, and npm state instead of colliding with already-published versions.
+  - Removed merge-message-dependent publish gating so protected-branch-safe release merges still publish when `main` carries a new package version.
 
 - **Security**
   - (placeholder)

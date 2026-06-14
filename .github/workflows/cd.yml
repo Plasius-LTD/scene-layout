@@ -288,7 +288,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
   publish:
-    if: "${{ github.event_name == 'push' && startsWith(github.event.head_commit.message, 'chore: prepare release v') }}"
+    if: github.event_name == 'push'
     needs: select-runner
     runs-on: ${{ fromJSON(needs.select-runner.outputs.runner_labels) }}
     environment: production
