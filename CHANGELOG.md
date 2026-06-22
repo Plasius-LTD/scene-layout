@@ -20,6 +20,20 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 - **Security**
   - (placeholder)
 
+## [0.1.4] - 2026-06-22
+
+- **Added**
+  - (placeholder)
+
+- **Changed**
+  - (placeholder)
+
+- **Fixed**
+  - (placeholder)
+
+- **Security**
+  - (placeholder)
+
 ## [0.1.3] - 2026-06-22
 
 - **Added**
@@ -66,9 +80,10 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
 
 ---
 
-[Unreleased]: https://github.com/Plasius-LTD/scene-layout/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/Plasius-LTD/scene-layout/compare/v0.1.4...HEAD
 
 
 [0.1.0]: https://github.com/Plasius-LTD/scene-layout/releases/tag/v0.1.0
 [0.1.2]: https://github.com/Plasius-LTD/scene-layout/releases/tag/v0.1.2
 [0.1.3]: https://github.com/Plasius-LTD/scene-layout/releases/tag/v0.1.3
+[0.1.4]: https://github.com/Plasius-LTD/scene-layout/releases/tag/v0.1.4
