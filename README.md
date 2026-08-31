@@ -4,6 +4,7 @@
 [![Build Status](https://img.shields.io/github/actions/workflow/status/Plasius-LTD/scene-layout/ci.yml?branch=main&label=build&style=flat)](https://github.com/Plasius-LTD/scene-layout/actions/workflows/ci.yml)
 [![coverage](https://img.shields.io/codecov/c/github/Plasius-LTD/scene-layout)](https://codecov.io/gh/Plasius-LTD/scene-layout)
 [![License](https://img.shields.io/github/license/Plasius-LTD/scene-layout)](./LICENSE)
+[![Code of Conduct](https://img.shields.io/badge/code%20of%20conduct-yes-blue.svg)](./CODE_OF_CONDUCT.md)
 [![Security Policy](https://img.shields.io/badge/security%20policy-yes-orange.svg)](./SECURITY.md)
 [![Changelog](https://img.shields.io/badge/changelog-md-blue.svg)](./CHANGELOG.md)
 
