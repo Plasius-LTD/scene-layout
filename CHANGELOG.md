@@ -18,6 +18,7 @@ The format is based on **[Keep a Changelog](https://keepachangelog.com/en/1.1.0/
   - (placeholder)
 
 - **Security**
+  - Updated Vitest and its coverage adapter to 4.1.11, clearing the redirect-mock path traversal advisory.
   - (placeholder)
 
 ## [0.1.5] - 2026-09-13
